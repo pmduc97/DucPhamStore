@@ -1,0 +1,54 @@
+﻿@model IEnumerable<DucPhamStore.Models.Loai>
+
+@{
+    ViewBag.Title = "Quản Lý Loại";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    int i = 1;
+}
+
+<h2>Quản Lý Loại</h2>
+
+<p>
+    @Html.ActionLink("Thêm loại mới", "Create",new { },htmlAttributes: new { @class = "btn btn-sm btn-info" })
+</p>
+<table class="table">
+    <tr class="label-default">
+        <th>STT</th>
+        <th>
+           Tên loại
+        </th>
+        <th>
+            Trạng thái
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @i
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.TenLoai)
+        </td>
+        <td>
+            @{ 
+                if (item.Active)
+                {
+                    <div class="btn-info btn-sm btn">Active</div>
+                }
+                else
+                {
+                    <div class="btn btn-sm btn-warning">Non-Active</div>
+                }
+            }
+        </td>
+        <td>
+            <a class="btn btn-sm btn-success" href="/QuanLyLoai/Edit/@item.MaLoai">Sửa</a> |
+            <a class="btn btn-sm btn-danger" href="/QuanLyLoai/Delete/@item.MaLoai">Xóa</a>
+        </td>
+    </tr>
+      i++;
+    }
+
+</table>
