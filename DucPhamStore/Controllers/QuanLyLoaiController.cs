@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using DucPhamStore.Models;
+using PagedList;
 
 namespace DucPhamStore.Controllers
 {
@@ -15,12 +16,25 @@ namespace DucPhamStore.Controllers
         private DucPhamStoreEntities db = new DucPhamStoreEntities();
 
         // GET: QuanLyLoai
-        public ActionResult Index(string key)
+        public ActionResult Index(string key,string trangthai,int? page)
         {
-            if(key == null)
-                return View(db.Loais.ToList());
-            var lstFind = db.Loais.Where(p => p.TenLoai.ToLower().Contains(key.ToLower()) || p.MaLoai.ToLower().Contains(key.ToLower())).ToList();
-            return View(lstFind);
+            var t = db.Loais.OrderBy(p=>p.TenLoai).ToList();
+            if(key != null)
+            {
+                ViewBag.Key = key;
+                t = t.Where(p => p.TenLoai.ToLower().Contains(key.ToLower()) || p.MaLoai.ToLower().Contains(key.ToLower())).ToList();
+            }
+            if(trangthai != null)
+            {
+                ViewBag.TrangThai = trangthai;
+                if (trangthai.Equals("active"))
+                    t = t.Where(p => p.Active == true).ToList();
+                if (trangthai.Equals("non-active"))
+                    t = t.Where(p => p.Active == false).ToList();
+            }
+            int pageNumber = page??1;
+            int pageSize = 6;
+            return View(t.ToPagedList(pageNumber,pageSize));
         }
 
         // GET: QuanLyLoai/Details/5
@@ -92,28 +106,34 @@ namespace DucPhamStore.Controllers
             return View(loai);
         }
 
-        // GET: QuanLyLoai/Delete/5
-        public ActionResult Delete(string id)
+        // POST: QuanLyLoai/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Delete(string MaLoai)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Loai loai = db.Loais.Find(id);
-            if (loai == null)
+            var t = db.Loais.Where(p => p.MaLoai.Equals(MaLoai));
+            if(t.Count() == 0)
             {
                 return HttpNotFound();
             }
-            return View(loai);
+            Loai loai = t.First();
+            db.Loais.Remove(loai);
+            db.SaveChanges();
+            return RedirectToAction("Index");
         }
 
-        // POST: QuanLyLoai/Delete/5
-        [HttpPost, ActionName("Delete")]
+        //POST: QuanLyLoai/Active
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(string id)
+        public ActionResult Active(string MaLoai)
         {
-            Loai loai = db.Loais.Find(id);
-            db.Loais.Remove(loai);
+            var t = db.Loais.Where(p => p.MaLoai.Equals(MaLoai));
+            if (t.Count() == 0)
+            {
+                return HttpNotFound();
+            }
+            Loai loai = t.First();
+            loai.Active = !loai.Active;
             db.SaveChanges();
             return RedirectToAction("Index");
         }

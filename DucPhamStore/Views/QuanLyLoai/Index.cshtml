@@ -1,4 +1,5 @@
-﻿@model IEnumerable<DucPhamStore.Models.Loai>
+﻿@model PagedList.IPagedList<DucPhamStore.Models.Loai>
+@using PagedList.Mvc;
 
 @{
     ViewBag.Title = "Quản Lý Loại";
@@ -8,55 +9,107 @@
 
 <h2>Quản Lý Loại</h2>
 <div class="row">
-    <div class="col-md-8">
-        <form class="form-inline" method="get" action="">
+    <div class="col-md-5">
+        <form class="form-inline" method="get" action="" id="form-find">
             <input name="key" id="key" placeholder="Nhập từ khóa cần tìm" value="" type="text" class="form-control" />
-            <input value="Tìm Kiếm" type="submit" class="btn btn-sm btn-success" />
+            <button onclick="return checkInputFind()" class="btn btn-sm btn-success" type="submit" form="form-find"><span class="glyphicon glyphicon-search"></span> Tìm kiếm</button>
         </form>
     </div>
-    <div class="col-md-4">
-        @Html.ActionLink("Thêm loại mới", "Create", new { }, htmlAttributes: new { @class = "btn btn-sm btn-info", @style = "float: right;" })
+    <div class="col-md-5">
+        <form class="form-inline" method="get" action="">
+            <select name="trangthai" id="trangthai" class="form-control" style="width:150px;">
+                <option value="all">Tất cả</option>
+                <option value="active">Kích hoạt</option>
+                <option value="non-active">Không kích hoạt</option>
+            </select>
+            <button class="btn btn-sm btn-success" type="submit"><span class="glyphicon glyphicon-glass"></span> Lọc</button>
+        </form>
+    </div>
+    <div class="col-md-2">
+        <a class="btn btn-sm btn-info" style="float:right;" href="/QuanLyLoai/Create"><span class="glyphicon glyphicon-pencil"></span> Thêm mới</a>
     </div>
 </div>
 <hr />
-<table class="table">
-    <tr class="label-default">
-        <th>STT</th>
-        <th>
-           Tên loại
-        </th>
-        <th>
-            Trạng thái
-        </th>
-        <th></th>
-    </tr>
-
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @i
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.TenLoai)
-        </td>
-        <td>
-            @{ 
-                if (item.Active)
+<div class="row">
+    <div class="col-md-12">
+        @{
+            if (Model.Count() == 0)
+            {
+                Output.WriteLine("Không có dữ liệu!");
+            }
+            else
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width:80px;">STT</th>
+                            <th style="width:550px;">Tên loại</th>
+                            <th style="width:150px;">Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @i
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.TenLoai)
+                                </td>
+                                <td>
+                                    @{
+                                        if (item.Active)
+                                        {
+                                            <div>Kích hoạt</div>
+                                        }
+                                        else
+                                        {
+                                            <div style="color:red;">Không kích hoạt</div>
+                                        }
+                                    }
+                                </td>
+                                <td class="text-right">
+                                    <form style="display:inline-flex;" method="post" action="/QuanLyLoai/Active">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="MaLoai" id="MaLoai" value="@item.MaLoai" />
+                                        <button class="btn btn-sm btn-warning" type="submit"><span class="glyphicon glyphicon-eye-@{Output.Write(item.Active?"close":"open");} "></span></button>
+                                    </form> |
+                                    <a class="btn btn-sm btn-success" href="/QuanLyLoai/Edit/@item.MaLoai"><span class="glyphicon glyphicon-edit"></span> Sửa</a> |
+                                    <form style="display:inline-flex;" method="post" action="/QuanLyLoai/Delete">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="MaLoai" id="MaLoai" value="@item.MaLoai" />
+                                        <button onclick="return checkDelete()" class="btn btn-sm btn-danger" type="submit"><span class="glyphicon glyphicon-trash"></span> Xóa</button>
+                                    </form>
+                                </td>
+                            </tr>
+        i++;
+    }
+                    </tbody>
+                </table>
+    }
+        }
+        <!-- Thêm mã phân trang -->
+        <div class="row text-center">
+            Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount
+            @{
+                if (ViewBag.Key != null)
                 {
-                    <div class="btn-info btn-sm btn">Active</div>
+                    @Html.PagedListPager(Model, page => Url.Action("Index", new { key = ViewBag.Key, page }))
+                }
+                else if (ViewBag.TrangThai != null)
+                {
+                    @Html.PagedListPager(Model, page => Url.Action("Index", new { trangthai = ViewBag.TrangThai, page }))
                 }
                 else
                 {
-                    <div class="btn btn-sm btn-warning">Non-Active</div>
+                    @Html.PagedListPager(Model, page => Url.Action("Index", new { page }))
                 }
-            }
-        </td>
-        <td>
-            <a class="btn btn-sm btn-success" href="/QuanLyLoai/Edit/@item.MaLoai">Sửa</a> |
-            <a class="btn btn-sm btn-danger" href="/QuanLyLoai/Delete/@item.MaLoai">Xóa</a>
-        </td>
-    </tr>
-      i++;
-    }
 
-</table>
+            }
+
+        </div>
+        <!-- Kết thúc -->
+    </div>
+</div>
+

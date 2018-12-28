@@ -1,0 +1,100 @@
+﻿@model PagedList.IPagedList<DucPhamStore.Models.Hang>
+@using DucPhamStore.Models;
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Quản Lý Hãng";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    int i = 1;
+}
+
+<h2>Quản Lý Hãng</h2>
+<div class="row">
+    <div class="col-md-5">
+        <form class="form-inline" action="" method="get">
+            <input class="form-control" id="key" name="key" value="" placeholder="Nhập từ khóa cần tìm" />
+            <button type="submit" onclick="return checkInputFind()" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-search"></span> Tìm kiếm</button>
+        </form>
+    </div>
+    <div class="col-md-5">
+        <form class="form-inline" action="" method="get">
+            <select name="trangthai" id="trangthai" class="form-control" style="width: 150px;">
+                <option value="all">Tất cả</option>
+                <option value="active">Kích hoạt</option>
+                <option value="non-active">Không kích hoạt</option>
+            </select>
+            <button type="submit" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-glass"></span> Lọc</button>
+        </form>
+    </div>
+    <div class="col-md-2">
+        <a class="btn btn-sm btn-info" style="float:right;" href="/QuanLyHang/Insert" ><span class="glyphicon glyphicon-pencil"></span> Thêm mới</a>
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col-md-12">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th style="width:80px;">STT</th>
+                    <th style="width:550px;">Tên hãng</th>
+                    <th style="width:150px;">Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Hang h in Model)
+                {
+                    <tr>
+                        <td>@i</td>
+                        <td>@h.TenHang</td>
+                        <td>
+                            @if (h.Active) {
+                            <div>Kích hoạt</div>
+                                    }else{
+                            <div style = "color:red;" >Không kích hoạt</div>
+                            }
+                        </td>
+                        <td class="text-right">
+                            <form style="display:inline-flex;" action="/QuanLyHang/Active" method="post">
+                                @Html.AntiForgeryToken()
+                                <input id="MaHang" name="MaHang" value="@h.MaHang" type="hidden" />
+                                <button type="submit" class="btn btn-warning btn-sm"><span class="glyphicon glyphicon-eye-@{Output.Write(h.Active?"close":"open");} "></span></button>
+                            </form> | 
+                            <form style="display:inline-flex;" action="/QuanLyHang/Edit" method="get">
+                                <input id="MaHang" name="MaHang" value="@h.MaHang" type="hidden" />
+                                <button type="submit" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-edit"></span> Sửa</button>
+                            </form> | 
+                            <form style="display:inline-flex;" action="/QuanLyHang/Delete" method="post">
+                                @Html.AntiForgeryToken()
+                                <input id="MaHang" name="MaHang" value="@h.MaHang" type="hidden" />
+                                <button type="submit" onclick="return checkDelete()" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-trash"></span> Xóa</button>
+                            </form>
+                        </td>
+                    </tr>
+                    i++;
+                }
+            </tbody>
+        </table>
+        <!-- Thêm mã phân trang -->
+        <div class="row text-center">
+            Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount
+            @{
+                if (ViewBag.Key != null)
+                {
+                    @Html.PagedListPager(Model, page => Url.Action("Index", new { key = ViewBag.Key, page }))
+                }
+                else if (ViewBag.TrangThai != null)
+                {
+                    @Html.PagedListPager(Model, page => Url.Action("Index", new { trangthai = ViewBag.TrangThai, page }))
+                }
+                else
+                {
+                    @Html.PagedListPager(Model, page => Url.Action("Index", new { page }))
+                }
+
+            }
+
+        </div>
+        <!-- Kết thúc -->
+    </div>
+</div>
+

@@ -67,3 +67,7 @@ D:\DotNet\DucPhamStore\DucPhamStore\bin\Microsoft.Owin.Security.MicrosoftAccount
 D:\DotNet\DucPhamStore\DucPhamStore\obj\Debug\DucPhamStore.csprojResolveAssemblyReference.cache
 D:\DotNet\DucPhamStore\DucPhamStore\obj\Debug\DucPhamStore.dll
 D:\DotNet\DucPhamStore\DucPhamStore\obj\Debug\DucPhamStore.pdb
+D:\DotNet\DucPhamStore\DucPhamStore\bin\PagedList.dll
+D:\DotNet\DucPhamStore\DucPhamStore\bin\PagedList.Mvc.dll
+D:\DotNet\DucPhamStore\DucPhamStore\bin\PagedList.xml
+D:\DotNet\DucPhamStore\DucPhamStore\bin\PagedList.Mvc.xml
