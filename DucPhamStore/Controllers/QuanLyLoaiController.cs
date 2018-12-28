@@ -15,9 +15,12 @@ namespace DucPhamStore.Controllers
         private DucPhamStoreEntities db = new DucPhamStoreEntities();
 
         // GET: QuanLyLoai
-        public ActionResult Index()
+        public ActionResult Index(string key)
         {
-            return View(db.Loais.ToList());
+            if(key == null)
+                return View(db.Loais.ToList());
+            var lstFind = db.Loais.Where(p => p.TenLoai.ToLower().Contains(key.ToLower()) || p.MaLoai.ToLower().Contains(key.ToLower())).ToList();
+            return View(lstFind);
         }
 
         // GET: QuanLyLoai/Details/5

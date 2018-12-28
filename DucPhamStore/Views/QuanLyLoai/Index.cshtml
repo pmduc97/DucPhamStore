@@ -7,10 +7,18 @@
 }
 
 <h2>Quản Lý Loại</h2>
-
-<p>
-    @Html.ActionLink("Thêm loại mới", "Create",new { },htmlAttributes: new { @class = "btn btn-sm btn-info" })
-</p>
+<div class="row">
+    <div class="col-md-8">
+        <form class="form-inline" method="get" action="">
+            <input name="key" id="key" placeholder="Nhập từ khóa cần tìm" value="" type="text" class="form-control" />
+            <input value="Tìm Kiếm" type="submit" class="btn btn-sm btn-success" />
+        </form>
+    </div>
+    <div class="col-md-4">
+        @Html.ActionLink("Thêm loại mới", "Create", new { }, htmlAttributes: new { @class = "btn btn-sm btn-info", @style = "float: right;" })
+    </div>
+</div>
+<hr />
 <table class="table">
     <tr class="label-default">
         <th>STT</th>
